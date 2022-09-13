@@ -7,6 +7,7 @@
  */
 package no.ntnu.idata2302.lab02;
 
+import java.io.Serializable; 
 
 /**
  * Represents a dynamic array class capable of storing values of type <code>int</code>. 
@@ -15,9 +16,10 @@ package no.ntnu.idata2302.lab02;
  * number of values that are stored, which makes it more memory efficient.
  * 
  * @author Jorgfi
- * @version 06.09.2022
+ * @version 1.1
+ * @since 06.09.2022
  */
-public class Sequence {
+public class Sequence implements Serializable {
 
     // Representing the capacity of the array
     private int capacity;
@@ -34,6 +36,7 @@ public class Sequence {
         this.capacity = 100;
         this.collection = new int[capacity];
     }
+
 
 
     /**
@@ -57,23 +60,49 @@ public class Sequence {
     /**
      * Increments the length of the sequence by one
      */
-    private void incrementLength() {this.length++;}
+    protected void incrementLength() {this.length++;}
 
     /**
      * Decrements the length of the sequence by one, if length is greater than 0
      */
-    private void decrementLength() {if (this.length > 0) {this.length--;}}
-
+    protected void decrementLength() {if (this.length > 0) {this.length--;}}
 
     /**
-     * Fills a given int array with all of the elements in the sequence
-     * @param intArray int[] to be filled with elements from sequence
+     * Replaces the collection with a new one
+     * @param int[] new collection 
      */
-    private void updateIntArray(int[] intArray) {
-        int i = 0;
-        while (i < this.getLength()) {intArray[i] = this.get(i); i++;}
+    private void setCollection(int[] newCollection) {this.collection = newCollection;}
+
+    /**
+     * Fills a given int array with all of the elements in the collection
+     */
+    protected void updateCollection() {
+        final int[] temp = new int[this.getCapacity()];
+        for (int i : collection) {
+            temp[i] = i;
+        }
+        this.setCollection(temp);
     }
 
+    /**
+     * Checks if the capacity needs to be adjusted. It does so if:
+     * 1: Capacity increases with 100% if the capacity is reached
+     * 2: Capacity decreases with 50% if only 50% or less of the capacity is used
+     * @param int option number 1 when inserting, and 2 when removing
+     */
+    public void checkCapacity(int option) {
+        if (option == 1) {
+            if (this.getCapacity() == (this.getLength()+1)) {
+                this.setCapacity(this.getCapacity()*2);
+            } 
+        } else if (option == 2) {
+            if ((this.getLength()-1)*4 <= this.getCapacity()) {
+                this.setCapacity(this.getCapacity()/2);
+            } 
+        } else {
+            throw new IllegalArgumentException("Not valid option");
+        }
+    }
 
     /**
      * Mutates the capacity of the sequence
@@ -83,6 +112,7 @@ public class Sequence {
     private void setCapacity(int newCapacity) throws IllegalArgumentException {
         if (newCapacity <= 0) {throw new IllegalArgumentException("Must be positive");}
         this.capacity = newCapacity;
+        this.updateCollection();
     }
 
     
@@ -109,12 +139,9 @@ public class Sequence {
      * @param item int value to insert
      */
     public void insert(int item) {
-        if (this.getCapacity() == (this.getLength()+1)) {this.setCapacity(this.getCapacity()*2);}
+        this.checkCapacity(1);
+        this.collection[this.getLength()] = item;
         this.incrementLength();
-        final int[] intArray = new int[this.getCapacity()];
-        this.updateIntArray(intArray);
-        intArray[this.getLength()-1] = item;
-        collection = intArray;
     }
 
 
@@ -125,11 +152,8 @@ public class Sequence {
      */
     public void remove() throws ArrayIndexOutOfBoundsException {
         if (this.getLength() < 1) {throw new ArrayIndexOutOfBoundsException();}
-        if ((this.getLength()-1)*4 <= this.getCapacity()) {this.setCapacity(this.getCapacity()/2);}
-        final int[] intArray = new int[this.getCapacity()];
-        this.updateIntArray(intArray);
-        intArray[this.getLength()-1] = 0;
+        this.checkCapacity(2);
         this.decrementLength();
-        collection = intArray;
+        this.collection[this.getLength()] = 0;
     }
 }

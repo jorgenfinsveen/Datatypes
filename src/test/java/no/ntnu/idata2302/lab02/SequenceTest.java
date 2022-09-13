@@ -10,6 +10,7 @@ package no.ntnu.idata2302.lab02;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
 
@@ -20,8 +21,7 @@ import org.junit.jupiter.api.Test;
  * @author Jorgfinsv
  * @version 06.09.2022
  */
-public class SequenceTest
-{
+public class SequenceTest {
     /**
      * Tests that a new sequence instance is empty at the time of creation.
      * @asserts that the sequence is empty
@@ -69,6 +69,7 @@ public class SequenceTest
     @Test
     public void sequenceRisesCapacity() {
         final Sequence sequence = new Sequence();
+        assertEquals(100, sequence.getCapacity());
         for (int i = 0; i < 100; i++) {sequence.insert(i);}
         assertEquals(200, sequence.getCapacity());
     }
